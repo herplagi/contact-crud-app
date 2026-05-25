@@ -12,7 +12,7 @@ export function ContactCard({ contact, onDelete, onEdit }: ContactCardProps) {
 
   return (
     <article className="contact-card">
-      <img src={contact.picture} alt={fullName} />
+      <img className="contact-avatar" src={contact.picture} alt={fullName} />
 
       <div className="contact-card__content">
         <div>
@@ -36,12 +36,13 @@ export function ContactCard({ contact, onDelete, onEdit }: ContactCardProps) {
       </div>
 
       <div className="card-actions">
-        <button className="icon-button" type="button" aria-label={`Edit ${fullName}`} onClick={() => onEdit(contact)}>
+        <button className="icon-button" type="button" title="Edit" aria-label={`Edit ${fullName}`} onClick={() => onEdit(contact)}>
           <Edit3 size={18} />
         </button>
         <button
           className="icon-button danger"
           type="button"
+          title="Delete"
           aria-label={`Delete ${fullName}`}
           onClick={() => onDelete(contact.id)}
         >

@@ -1,4 +1,4 @@
-import { Save, X } from 'lucide-react'
+import { Save } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import type { Contact, ContactFormValues } from '../types/contact'
 
@@ -6,6 +6,7 @@ type ContactFormProps = {
   editingContact: Contact | null
   onCancelEdit: () => void
   onSubmit: (values: ContactFormValues, id?: string) => void
+  titleId?: string
 }
 
 const emptyForm: ContactFormValues = {
@@ -18,7 +19,7 @@ const emptyForm: ContactFormValues = {
   picture: '',
 }
 
-export function ContactForm({ editingContact, onCancelEdit, onSubmit }: ContactFormProps) {
+export function ContactForm({ editingContact, onCancelEdit, onSubmit, titleId }: ContactFormProps) {
   const [form, setForm] = useState<ContactFormValues>(emptyForm)
 
   useEffect(() => {
@@ -50,16 +51,11 @@ export function ContactForm({ editingContact, onCancelEdit, onSubmit }: ContactF
 
   return (
     <form className="contact-form" onSubmit={handleSubmit}>
-      <div className="panel-heading">
+      <div className="modal-heading">
         <div>
           <p className="eyebrow">{editingContact ? 'Edit contact' : 'New contact'}</p>
-          <h2>{editingContact ? 'Update details' : 'Create contact'}</h2>
+          <h2 id={titleId}>{editingContact ? 'Update contact' : 'Create contact'}</h2>
         </div>
-        {editingContact && (
-          <button className="icon-button" type="button" aria-label="Cancel edit" onClick={onCancelEdit}>
-            <X size={18} />
-          </button>
-        )}
       </div>
 
       <div className="form-grid">
@@ -120,10 +116,17 @@ export function ContactForm({ editingContact, onCancelEdit, onSubmit }: ContactF
         </label>
       </div>
 
-      <button className="primary-button" type="submit">
-        <Save size={18} />
-        {editingContact ? 'Save changes' : 'Add contact'}
-      </button>
+      <div className="form-actions">
+        {editingContact && (
+          <button className="text-button" type="button" onClick={onCancelEdit}>
+            Cancel
+          </button>
+        )}
+        <button className="primary-button" type="submit">
+          <Save size={18} />
+          {editingContact ? 'Save changes' : 'Add contact'}
+        </button>
+      </div>
     </form>
   )
 }
