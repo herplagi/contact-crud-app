@@ -4,6 +4,7 @@ import { AppSidebar, type DirectoryView } from './components/AppSidebar'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { ContactList } from './components/ContactList'
 import { ContactModal } from './components/ContactModal'
+import { Pagination } from './components/Pagination'
 import { useAppDispatch, useAppSelector } from './app/hooks'
 import {
   selectContacts,
@@ -14,6 +15,8 @@ import {
 } from './features/contacts/contactsSelectors'
 import { addContact, deleteContact, loadContacts, setQuery, updateContact } from './features/contacts/contactsSlice'
 import type { Contact, ContactFormValues } from './types/contact'
+
+const PAGE_SIZE = 10
 
 function App() {
   const dispatch = useAppDispatch()
@@ -28,6 +31,7 @@ function App() {
   const [theme, setTheme] = useState<'light' | 'night'>('light')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [directoryView, setDirectoryView] = useState<DirectoryView>('all')
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     if (status === 'idle') {
@@ -38,6 +42,10 @@ function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [query, directoryView, viewMode])
 
   const stats = useMemo(() => {
     const countries = new Set(contacts.map((contact) => contact.country))
@@ -50,6 +58,23 @@ function App() {
       filtered: filteredContacts.length,
     }
   }, [contacts, filteredContacts])
+
+  const pagination = useMemo(() => {
+    const totalItems = filteredContacts.length
+    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE))
+    const safePage = Math.min(currentPage, totalPages)
+    const startIndex = (safePage - 1) * PAGE_SIZE
+    const endIndex = Math.min(startIndex + PAGE_SIZE, totalItems)
+
+    return {
+      contacts: filteredContacts.slice(startIndex, endIndex),
+      currentPage: safePage,
+      endItem: endIndex,
+      startItem: totalItems === 0 ? 0 : startIndex + 1,
+      totalItems,
+      totalPages,
+    }
+  }, [currentPage, filteredContacts])
 
   const handleSubmit = (values: ContactFormValues, id?: string) => {
     if (id && editingContact) {
@@ -193,16 +218,27 @@ function App() {
           {status === 'loading' && contacts.length === 0 ? (
             <div className="loading-state">Loading contacts...</div>
           ) : (
-            <ContactList
-              contacts={filteredContacts}
-              groupBy={groupBy}
-              viewMode={viewMode}
-              onDelete={(id) => {
-                const target = contacts.find((contact) => contact.id === id)
-                setDeletingContact(target ?? null)
-              }}
-              onEdit={handleEditContact}
-            />
+            <>
+              <ContactList
+                contacts={pagination.contacts}
+                groupBy={groupBy}
+                viewMode={viewMode}
+                onDelete={(id) => {
+                  const target = contacts.find((contact) => contact.id === id)
+                  setDeletingContact(target ?? null)
+                }}
+                onEdit={handleEditContact}
+              />
+              <Pagination
+                currentPage={pagination.currentPage}
+                endItem={pagination.endItem}
+                pageSize={PAGE_SIZE}
+                startItem={pagination.startItem}
+                totalItems={pagination.totalItems}
+                totalPages={pagination.totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </>
           )}
         </section>
       </section>
