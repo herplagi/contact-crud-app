@@ -33,7 +33,7 @@ export function AppSidebar({
     <aside className="app-sidebar">
       <div className="brand-block">
         <div>
-          <h1>PEOPLE</h1>
+          <h1>Contact</h1>
           <p>// contact manager v1.0</p>
         </div>
       </div>
