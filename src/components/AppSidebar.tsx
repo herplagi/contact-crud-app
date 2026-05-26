@@ -34,7 +34,6 @@ export function AppSidebar({
       <div className="brand-block">
         <div>
           <h1>Contact</h1>
-          <p>// contact manager v1.0</p>
         </div>
       </div>
 
